@@ -13,6 +13,7 @@ export default function MyEvents() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState("");
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -34,7 +35,7 @@ export default function MyEvents() {
     return () => {
       active = false;
     };
-  }, [user]);
+  }, [reloadToken, user]);
 
   async function handleDelete(id) {
     if (!window.confirm("Delete this event? This cannot be undone.")) return;
@@ -77,6 +78,17 @@ export default function MyEvents() {
           <div className="alert alert-error">
             <Icon name="alert" size={18} />
             <span>{error}</span>
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={() => {
+                setLoading(true);
+                setError("");
+                setReloadToken((value) => value + 1);
+              }}
+            >
+              Try again
+            </button>
           </div>
         ) : events.length === 0 ? (
           <EmptyState

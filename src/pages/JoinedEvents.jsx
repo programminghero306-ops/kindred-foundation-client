@@ -13,6 +13,7 @@ export default function JoinedEvents() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -38,7 +39,7 @@ export default function JoinedEvents() {
     return () => {
       active = false;
     };
-  }, [user]);
+  }, [reloadToken, user]);
 
   return (
     <div className="page">
@@ -65,6 +66,17 @@ export default function JoinedEvents() {
           <div className="alert alert-error">
             <Icon name="alert" size={18} />
             <span>{error}</span>
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={() => {
+                setLoading(true);
+                setError("");
+                setReloadToken((value) => value + 1);
+              }}
+            >
+              Try again
+            </button>
           </div>
         ) : events.length === 0 ? (
           <EmptyState

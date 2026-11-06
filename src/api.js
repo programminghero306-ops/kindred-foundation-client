@@ -70,6 +70,11 @@ async function request(path, { method = "GET", body, auth = false } = {}) {
         body: body !== undefined ? JSON.stringify(body) : undefined,
         signal: controller.signal,
       });
+      if ([502, 503, 504].includes(response.status) && attempt < attempts) {
+        response = null;
+        await new Promise((resolve) => window.setTimeout(resolve, 1000));
+        continue;
+      }
       break;
     } catch (error) {
       lastError = error;
