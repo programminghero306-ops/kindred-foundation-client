@@ -21,6 +21,10 @@ React 19 + Vite.
 - Backend: https://kindread-foundation-server.onrender.com
 - Backend health: https://kindread-foundation-server.onrender.com/health
 
+## Deployment
+
+The live Vercel project is connected to this repository's `main` branch. Pushes to GitHub automatically trigger a production deployment.
+
 ## Requirements
 
 - Node.js 18 or newer
