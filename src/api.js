@@ -1,4 +1,12 @@
-const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(
+const isLocalHost =
+  typeof window !== "undefined" &&
+  ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+
+const fallbackApiUrl = isLocalHost
+  ? "http://localhost:5000"
+  : "https://kindread-foundation-server.onrender.com";
+
+const API_URL = (import.meta.env.VITE_API_URL || fallbackApiUrl).replace(
   /\/$/,
   ""
 );
@@ -56,7 +64,9 @@ async function request(path, { method = "GET", body, auth = false } = {}) {
     });
   } catch {
     throw new Error(
-      "Cannot reach the server. Make sure the backend is running on port 5000."
+      isLocalHost
+        ? "Cannot reach the local server. Start the backend with npm start on port 5000."
+        : "Cannot reach the backend server. Please try again in a moment."
     );
   }
 
