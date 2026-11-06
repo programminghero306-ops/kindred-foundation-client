@@ -55,22 +55,39 @@ async function request(path, { method = "GET", body, auth = false } = {}) {
     if (token) headers.Authorization = `Bearer ${token}`;
   }
 
-  let response;
-  try {
+  let response = null;
+  let lastError = null;
+  const attempts = isLocalHost ? 1 : 2;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), 20000);
-    response = await fetch(`${API_URL}${path}`, {
-      method,
-      headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-      signal: controller.signal,
-    });
-    window.clearTimeout(timeoutId);
-  } catch {
+
+    try {
+      response = await fetch(`${API_URL}${path}`, {
+        method,
+        headers,
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+      });
+      break;
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) {
+        await new Promise((resolve) => window.setTimeout(resolve, 750));
+      }
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
+  }
+
+  if (!response) {
     throw new Error(
-      isLocalHost
-        ? "Cannot reach the local server. Start the backend with npm start on port 5000."
-        : "Cannot reach the backend server. Please try again in a moment."
+      lastError?.name === "AbortError"
+        ? "The backend request timed out. Please try again."
+        : isLocalHost
+          ? "Cannot reach the local server. Start the backend with npm start on port 5000."
+          : "Cannot reach the backend server. Please try again in a moment."
     );
   }
 

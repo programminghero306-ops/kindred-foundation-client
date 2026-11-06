@@ -60,6 +60,14 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/joined"
+            element={
+              <ProtectedRoute>
+                <JoinedEvents />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
