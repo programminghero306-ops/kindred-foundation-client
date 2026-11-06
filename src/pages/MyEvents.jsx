@@ -9,7 +9,6 @@ import Loader from "../components/Loader";
 
 export default function MyEvents() {
   const { user } = useAuth();
-  const email = user?.email;
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -18,10 +17,10 @@ export default function MyEvents() {
   useEffect(() => {
     let active = true;
 
-    if (!email) return undefined;
+    if (!user) return undefined;
 
     api
-      .getMyEvents(email)
+      .getMyEvents()
       .then((data) => {
         if (active) setEvents(Array.isArray(data) ? data : []);
       })
@@ -35,7 +34,7 @@ export default function MyEvents() {
     return () => {
       active = false;
     };
-  }, [email]);
+  }, [user]);
 
   async function handleDelete(id) {
     if (!window.confirm("Delete this event? This cannot be undone.")) return;

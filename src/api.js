@@ -57,11 +57,15 @@ async function request(path, { method = "GET", body, auth = false } = {}) {
 
   let response;
   try {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 20000);
     response = await fetch(`${API_URL}${path}`, {
       method,
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
     });
+    window.clearTimeout(timeoutId);
   } catch {
     throw new Error(
       isLocalHost
@@ -98,7 +102,10 @@ export const api = {
     request("/auth/register", { method: "POST", body: payload }),
   login: (payload) =>
     request("/auth/login", { method: "POST", body: payload }),
-  me: () => request("/auth/me", { auth: true }),
+  me: async () => {
+    const data = await request("/auth/me", { auth: true });
+    return data?.user || data;
+  },
 
   getEvents: (limit) =>
     request(limit ? `/events?limit=${limit}` : "/events"),
@@ -112,10 +119,8 @@ export const api = {
 
   joinEvent: (payload) =>
     request("/joined-events", { method: "POST", body: payload, auth: true }),
-  getJoinedEvents: (email) =>
-    request(`/joined-events?email=${encodeURIComponent(email)}`, {
-      auth: true,
-    }),
-  getMyEvents: (email) =>
-    request(`/my-events?email=${encodeURIComponent(email)}`, { auth: true }),
+  getJoinedEvents: () =>
+    request("/joined-events", { auth: true }),
+  getMyEvents: () =>
+    request("/my-events", { auth: true }),
 };

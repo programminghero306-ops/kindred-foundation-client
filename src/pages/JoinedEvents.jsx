@@ -10,7 +10,6 @@ import { normalizeJoinedEvent } from "../utils";
 
 export default function JoinedEvents() {
   const { user } = useAuth();
-  const email = user?.email;
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -18,10 +17,10 @@ export default function JoinedEvents() {
   useEffect(() => {
     let active = true;
 
-    if (!email) return undefined;
+    if (!user) return undefined;
 
     api
-      .getJoinedEvents(email)
+      .getJoinedEvents()
       .then((data) => {
         if (active) {
           setEvents(
@@ -39,7 +38,7 @@ export default function JoinedEvents() {
     return () => {
       active = false;
     };
-  }, [email]);
+  }, [user]);
 
   return (
     <div className="page">
