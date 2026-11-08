@@ -1,12 +1,13 @@
 export const EVENT_TYPES = [
-  { value: "cleanup", label: "Cleanup" },
-  { value: "tree-planting", label: "Tree planting" },
-  { value: "food-drive", label: "Food drive" },
-  { value: "education", label: "Education" },
-  { value: "fundraiser", label: "Fundraiser" },
-  { value: "health", label: "Health" },
-  { value: "community", label: "Community" },
-  { value: "other", label: "Other" },
+  { value: "Cleanup", label: "Cleanup" },
+  { value: "Plantation", label: "Plantation" },
+  { value: "Donation", label: "Donation" },
+  { value: "Food Drive", label: "Food Drive" },
+  { value: "Education", label: "Education" },
+  { value: "Fundraiser", label: "Fundraiser" },
+  { value: "Health", label: "Health" },
+  { value: "Community", label: "Community" },
+  { value: "Other", label: "Other" },
 ];
 
 export function eventTypeLabel(value) {
@@ -17,6 +18,24 @@ export function eventTypeLabel(value) {
   return String(value)
     .replace(/[-_]/g, " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export function normalizeEventType(value) {
+  if (!value) return "";
+  const key = String(value).trim().toLowerCase().replace(/[_\s]+/g, "-");
+  const aliases = {
+    cleanup: "Cleanup",
+    plantation: "Plantation",
+    "tree-planting": "Plantation",
+    donation: "Donation",
+    "food-drive": "Food Drive",
+    education: "Education",
+    fundraiser: "Fundraiser",
+    health: "Health",
+    community: "Community",
+    other: "Other",
+  };
+  return aliases[key] || "";
 }
 
 export function formatDate(value) {

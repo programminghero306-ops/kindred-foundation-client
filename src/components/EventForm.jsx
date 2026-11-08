@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { EVENT_TYPES, toDateInput } from "../utils";
+import { EVENT_TYPES, normalizeEventType, toDateInput } from "../utils";
 import Icon from "./Icon";
 
 const EMPTY_EVENT = {
   title: "",
   description: "",
-  eventType: "cleanup",
+  eventType: "Cleanup",
   thumbnail: "",
   location: "",
   eventDate: "",
@@ -23,7 +23,8 @@ export default function EventForm({
   const [values, setValues] = useState({
     ...EMPTY_EVENT,
     ...initialValues,
-    eventType: initialValues?.eventType || EMPTY_EVENT.eventType,
+    eventType:
+      normalizeEventType(initialValues?.eventType) || EMPTY_EVENT.eventType,
     eventDate: toDateInput(initialValues?.eventDate),
   });
   const [errors, setErrors] = useState({});
