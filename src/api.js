@@ -57,11 +57,12 @@ async function request(path, { method = "GET", body, auth = false } = {}) {
 
   let response = null;
   let lastError = null;
-  const attempts = isLocalHost ? 1 : 2;
+  const attempts = isLocalHost ? 1 : 3;
+  const timeoutMs = isLocalHost ? 20000 : 90000;
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 20000);
+    const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       response = await fetch(`${API_URL}${path}`, {
@@ -72,14 +73,18 @@ async function request(path, { method = "GET", body, auth = false } = {}) {
       });
       if ([502, 503, 504].includes(response.status) && attempt < attempts) {
         response = null;
-        await new Promise((resolve) => window.setTimeout(resolve, 1000));
+        await new Promise((resolve) =>
+          window.setTimeout(resolve, attempt * 3000)
+        );
         continue;
       }
       break;
     } catch (error) {
       lastError = error;
       if (attempt < attempts) {
-        await new Promise((resolve) => window.setTimeout(resolve, 750));
+        await new Promise((resolve) =>
+          window.setTimeout(resolve, attempt * 3000)
+        );
       }
     } finally {
       window.clearTimeout(timeoutId);
@@ -89,7 +94,7 @@ async function request(path, { method = "GET", body, auth = false } = {}) {
   if (!response) {
     throw new Error(
       lastError?.name === "AbortError"
-        ? "The backend request timed out. Please try again."
+        ? "The backend is starting or temporarily unavailable. Please wait a moment and try again."
         : isLocalHost
           ? "Cannot reach the local server. Start the backend with npm start on port 5000."
           : "Cannot reach the backend server. Please try again in a moment."
