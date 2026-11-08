@@ -8,6 +8,11 @@ on:
 jobs:
   check-live:
     runs-on: ubuntu-latest
+    env:
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+      LIVE_CHECK_TIMEOUT_MS: "90000"
+      LIVE_CHECK_ATTEMPTS: "3"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
